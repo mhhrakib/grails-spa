@@ -191,7 +191,7 @@
         // Display pagination information
         var filteredCount = data.filteredCount;
         var totalCount = data.totalCount;
-        var start = ((data.currentPage - 1) * pageSize) + 1;
+        var start = ((data.currentPage - 1) * pageSize) + (data.totalPages == 0 ? 0:1);
         var end = Math.min(start + data.pageSize - 1, filteredCount);
         var info = 'Showing ' + start + ' to ' + end + ' of ' + filteredCount + ' entries (filtered from ' + totalCount + ' total entries)';
         $('#paginationInfo').text(info);
