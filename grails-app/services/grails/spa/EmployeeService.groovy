@@ -51,7 +51,7 @@ class EmployeeService {
         if (employee.save()) {
             return 'success'
         } else {
-            return [errors: employee.errors]
+            return employee.errors
         }
     }
 
@@ -62,7 +62,7 @@ class EmployeeService {
             if (employee.save()) {
                 return 'success'
             } else {
-                return [errors: employee.errors]
+                return employee.errors
             }
         } else {
             return 'not found'

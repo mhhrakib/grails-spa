@@ -90,6 +90,19 @@
     }
   }
 
+  function clearErrorOnFocus(field) {
+    var errorSpan = document.getElementById(field + "Error");
+    var inputField = document.getElementById(field);
+
+    inputField.addEventListener("focus", function() {
+      errorSpan.innerHTML = "";
+    });
+  }
+
+  clearErrorOnFocus("firstName");
+  clearErrorOnFocus("lastName");
+  clearErrorOnFocus("email");
+
   $(document).ready(function () {
     $('#submitBtn').click(function (event) {
       event.preventDefault();
@@ -218,7 +231,6 @@
             displayErrors(errors.errors);
           }
         });
-
       }
     });
   }
@@ -244,6 +256,12 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 <script>
   $(document).ready(function() {
+    $.validator.setDefaults({
+      submitHandler: function () {
+        // alert( "Form successful submitted!" );
+        $('#submitBtn').click();
+      }
+    });
     $("#employeeForm").validate({
       rules: {
         firstName: {
@@ -280,10 +298,10 @@
       errorElement : 'span',
       errorClass: 'text-danger text-sm',
       highlight: function(element) {
-        $(element).closest('.form-group').addClass('has-error');
+        $(element).closest('.form-group').addClass('error');
       },
       unhighlight: function(element) {
-        $(element).closest('.form-group').removeClass('has-error');
+        $(element).closest('.form-group').removeClass('error');
       },
       errorPlacement: function(error, element) {
         if (element.attr("name") == "firstName" ) {

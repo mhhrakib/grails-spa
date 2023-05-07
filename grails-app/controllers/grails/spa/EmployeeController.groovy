@@ -19,7 +19,9 @@ class EmployeeController {
         if (saveResult == 'success') {
             render 'success'
         } else {
-            render status: 400, contentType: 'application/json', saveResult
+            render status: 400, contentType: 'application/json', {
+                errors = saveResult
+            }
         }
     }
 
@@ -30,7 +32,9 @@ class EmployeeController {
         } else if(updateResult == 'not found') {
             render status: 404, 'not found'
         } else {
-            render status: 400, contentType: 'application/json', updateResult
+            render status: 400, contentType: 'application/json', {
+                errors = updateResult
+            }
         }
     }
 
