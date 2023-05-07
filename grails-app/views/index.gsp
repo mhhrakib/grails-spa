@@ -12,14 +12,14 @@
     <form id="employeeForm" action="${createLink(controller: 'employee', action: 'save')}" method="post">
         <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name"/>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" minlength="2" maxlength="50"/>
             <span class="error text-danger text-sm" id="firstNameError"></span>
             <br>
         </div>
 
         <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name"/>
+            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" minlength="2" maxlength="50"/>
             <span class="error text-danger text-sm" id="lastNameError"></span>
             <br>
         </div>
@@ -36,6 +36,22 @@
     <br>
 
     <h1>Employee List</h1>
+    <div class="row mb-3">
+        <div class="col-sm-6">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+        </div>
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col-sm-3">
+            <select id="pageSizeSelect" class="form-select">
+                <option value="5">5 per page</option>
+                <option value="10">10 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+            </select>
+        </div>
+    </div>
     <table class="table" id="employeeTable">
         <thead>
         <tr>
@@ -49,8 +65,18 @@
         <tbody>
         </tbody>
     </table>
+    <div class="row mb-3">
+        <div class="col-sm-6" id="paginationInfo">
+            Showing <span id="startEntry"></span> to <span id="endEntry"></span> of <span id="totalEntries"></span> entries
+        </div>
+        <div class="col-sm-6">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end" id="paginationLinks">
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   function displayErrors(errors) {
@@ -69,35 +95,60 @@
       event.preventDefault();
       var form = $('#employeeForm');
       var url = form.attr('action');
-      $.ajax({
-        type: "POST",
-        url: url,
-        data: form.serialize(),
-        success: function (data) {
-          alert('Employee saved successfully');
-          form.trigger('reset');
-          $('.error').text('');
-          $('#firstNameError, #lastNameError, #emailError').empty();
-          refreshTable();
-        },
-        error: function (xhr, status, error) {
-          var errors = $.parseJSON(xhr.responseText);
-          displayErrors(errors.errors);
-        }
-      });
+      if (confirm('Are you sure you want to save this employee?')) {
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: form.serialize(),
+          success: function (data) {
+            alert('Employee saved successfully');
+            form.trigger('reset');
+            $('.error').text('');
+            refreshTable();
+          },
+          error: function (xhr, status, error) {
+            var errors = $.parseJSON(xhr.responseText);
+            displayErrors(errors.errors);
+          }
+        });
+      }
     });
     refreshTable();
+    $('#search').on('keyup', function() {
+      dataTable.search($(this).val()).draw();
+    });
+    $('#searchInput').on('input', function () {
+      refreshTable();
+    });
+    $('#pageSizeSelect').on('change', function() {
+      refreshTable();
+    });
+    // Handle pagination links
+    $('#paginationLinks').on('click', '.page-link', function (event) {
+      event.preventDefault();
+      var page = $(this).text();
+      if(page == "Next") {
+        page = parseInt($('#paginationLinks .active').text()) + 1;
+      } else if(page == "Prev") {
+        page = parseInt($('#paginationLinks .active').text()) - 1;
+      }
+      refreshTable(page);
+    });
   });
 
-  function refreshTable() {
+  function refreshTable(page = 1) {
     var table = $('#employeeTable');
+    var search = $('#searchInput').val();
+    var pageSize = $('#pageSizeSelect').val() || 5;
     var url = "${createLink(controller: 'employee', action: 'list')}";
     $.ajax({
       type: "GET",
       url: url,
+      data: { page: page, pageSize:pageSize, search: search },
       success: function (data) {
+        console.log(data)
         table.find('tbody').empty();
-        $(data).each(function (index, element) {
+        $(data.employees).each(function (index, element) {
           var row = $('<tr>').appendTo(table.find('tbody'));
           $('<td>').text(element.id).appendTo(row);
           $('<td>').text(element.firstName).appendTo(row);
@@ -113,6 +164,25 @@
             deleteEmployee(element.id);
           });
         });
+        // Update pagination links
+        var links = $('#paginationLinks');
+        links.empty();
+        $('<li>').addClass('page-item').toggleClass('disabled', data.currentPage === 1).append($('<a>').addClass('page-link').attr('href', '#').text("Prev"))
+          .appendTo(links);
+        for (var i = 1; i <= data.totalPages; i++) {
+          $('<li>').addClass('page-item').toggleClass('active', i === data.currentPage).append($('<a>').addClass('page-link').attr('href', '#').text(i)).appendTo(links);
+        }
+        $('<li>').addClass('page-item').toggleClass('disabled', data.currentPage === data.totalPages).append($('<a>').addClass('page-link')
+          .attr('href', '#').text("Next")).appendTo(links);
+
+        // Display pagination information
+        var filteredCount = data.filteredCount;
+        var totalCount = data.totalCount;
+        var start = ((data.currentPage - 1) * pageSize) + 1;
+        var end = Math.min(start + data.pageSize - 1, filteredCount);
+        var info = 'Showing ' + start + ' to ' + end + ' of ' + filteredCount + ' entries (filtered from ' + totalCount + ' total entries)';
+        $('#paginationInfo').text(info);
+
       },
       error: function (xhr, status, error) {
         alert(xhr.responseText);
@@ -129,26 +199,27 @@
       event.preventDefault();
       var form = $('#employeeForm');
       var url = "${createLink(controller: 'employee', action: 'update')}" + '/' + id;
-      $.ajax({
-        type: "POST",
-        url: url,
-        data: form.serialize(),
-        success: function (data) {
-          alert('Employee updated successfully');
-          form.trigger('reset');
-          $('.error').text('');
-          $('#id').val('');
-          $('#submitBtn').text('Save').unbind('click').click(function (event) {
-            event.preventDefault();
-            saveEmployee();
-          });
-          refreshTable();
-        },
-        error: function (xhr, status, error) {
-          var errors = $.parseJSON(xhr.responseText);
-          displayErrors(errors.errors);
-        }
-      });
+      if (confirm('Are you sure you want to update this employee?')) {
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: form.serialize(),
+          success: function (data) {
+            alert('Employee updated successfully');
+            form.trigger('reset');
+            $('.error').text('');
+            $('#submitBtn').text('Save').unbind('click').click(function (event) {
+              event.preventDefault();
+            });
+            refreshTable();
+          },
+          error: function (xhr, status, error) {
+            var errors = $.parseJSON(xhr.responseText);
+            displayErrors(errors.errors);
+          }
+        });
+
+      }
     });
   }
 
@@ -169,6 +240,62 @@
     }
   }
 </script>
-%{--<script type="text/javascript" src="${resource(dir: 'js', file: 'employee.js')}"></script>--}%
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#employeeForm").validate({
+      rules: {
+        firstName: {
+          required: true,
+          minlength: 2,
+          maxlength: 50
+        },
+        lastName: {
+          required: true,
+          minlength: 2,
+          maxlength: 50
+        },
+        email: {
+          required: true,
+          email: true
+        }
+      },
+      messages: {
+        firstName: {
+          required: "Please enter your first name",
+          minlength: "First name must be at least 2 characters long",
+          maxlength: "First name cannot be more than 50 characters long"
+        },
+        lastName: {
+          required: "Please enter your last name",
+          minlength: "Last name must be at least 2 characters long",
+          maxlength: "Last name cannot be more than 50 characters long"
+        },
+        email: {
+          required: "Please enter email address",
+          email: "Please enter a valid email address"
+        }
+      },
+      errorElement : 'span',
+      errorClass: 'text-danger text-sm',
+      highlight: function(element) {
+        $(element).closest('.form-group').addClass('has-error');
+      },
+      unhighlight: function(element) {
+        $(element).closest('.form-group').removeClass('has-error');
+      },
+      errorPlacement: function(error, element) {
+        if (element.attr("name") == "firstName" ) {
+          error.appendTo( $("#firstNameError") );
+        } else if (element.attr("name") == "lastName" ) {
+          error.appendTo( $("#lastNameError") );
+        } else if (element.attr("name") == "email" ) {
+          error.appendTo( $("#emailError") );
+        }
+      }
+    });
+  });
+</script>
 </body>
 </html>

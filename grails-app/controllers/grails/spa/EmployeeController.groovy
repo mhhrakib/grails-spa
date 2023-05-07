@@ -3,50 +3,38 @@ package grails.spa
 import grails.converters.JSON
 
 class EmployeeController {
+    def employeeService
 
     def index() {
         redirect(action: 'list')
     }
 
     def list() {
-        def employees = Employee.list()
-        render employees as JSON
+        def result = employeeService.listEmployees(params)
+        render result as JSON
     }
 
     def save() {
-        def employee = new Employee(params)
-        if (employee.save()) {
+        def saveResult = employeeService.saveEmployee(params)
+        if (saveResult == 'success') {
             render 'success'
         } else {
-            render status: 400, contentType: 'application/json', {
-                errors = employee.errors
-            }
+            render status: 400, contentType: 'application/json', saveResult
         }
     }
 
     def update() {
-        def employee = Employee.get(params.id)
-        if (employee) {
-            employee.properties = params
-            if (employee.save()) {
-                render 'success'
-            } else {
-                render status: 400, contentType: 'application/json', {
-                    errors = employee.errors
-                }
-            }
+        def updateResult = employeeService.updateEmployee(params) // Call the updateEmployee method on the injected service
+        if (updateResult == 'success') {
+            render 'success'
+        } else if(updateResult == 'not found') {
+            render status: 404, 'not found'
         } else {
-            render 'not found'
+            render status: 400, contentType: 'application/json', updateResult
         }
     }
 
     def delete() {
-        def employee = Employee.get(params.id)
-        if (employee) {
-            employee.delete()
-            render 'success'
-        } else {
-            render 'not found'
-        }
+        return employeeService.deleteEmployee(params)
     }
 }
