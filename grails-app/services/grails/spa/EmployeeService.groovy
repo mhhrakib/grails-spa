@@ -2,6 +2,8 @@ package grails.spa
 
 class EmployeeService {
 
+    def fileService
+
     def listEmployees(params) {
         def page = params.int('page') ?: 1 // default to page 1
         def pageSize = params.int('pageSize') ?: 5 // default to 10 results per page
@@ -46,8 +48,11 @@ class EmployeeService {
         return result
     }
 
-    def saveEmployee(params) {
+    def saveEmployee(params, request) {
+        def birthCertificateFile = saveBirthCertificateFile(params, request)
         def employee = new Employee(params)
+        employee.birthCertificate = birthCertificateFile
+
         if (employee.save()) {
             return 'success'
         } else {
@@ -77,5 +82,14 @@ class EmployeeService {
         } else {
             return 'not found'
         }
+    }
+
+    private saveBirthCertificateFile(params, request) {
+        def birthCertificateFile = null
+        if (params.birthCertificate) {
+            def uploadedFile = request.getFile('birthCertificate')
+            birthCertificateFile = fileService.save(uploadedFile, "birthCertificate")
+        }
+        return birthCertificateFile
     }
 }
