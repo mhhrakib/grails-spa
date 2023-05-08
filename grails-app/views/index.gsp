@@ -30,6 +30,22 @@
             <span class="error text-danger text-sm" id="emailError"></span>
             <br>
         </div>
+
+        <div class="form-group">
+            <label for="birthDate">Birth Date</label>
+            <input type="date" class="form-control" id="birthDate" name="birthDate" required/>
+            <span class="error text-danger text-sm" id="birthDateError"></span>
+            <br>
+        </div>
+
+        <div class="form-group">
+            <label for="birthCertificate">Birth Certificate</label>
+            <input type="file" class="form-control" id="birthCertificate" name="birthCertificate"/>
+            <span class="error text-danger text-sm" id="birthCertificateError"></span>
+            <br>
+        </div>
+
+
         <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
     </form>
 
@@ -106,13 +122,20 @@
   $(document).ready(function () {
     $('#submitBtn').click(function (event) {
       event.preventDefault();
-      var form = $('#employeeForm');
-      var url = form.attr('action');
+      // var form = $('#employeeForm')[0];
+      // var url = form.attr('action');
+      // var formData = new FormData(form);
+      var form = $('#employeeForm')[0];
+      var url = form.action;
+      var formData = new FormData(form);
       if (confirm('Are you sure you want to save this employee?')) {
         $.ajax({
           type: "POST",
           url: url,
-          data: form.serialize(),
+          data: formData,
+          enctype: 'multipart/form-data', // Set the enctype to multipart/form-data for file uploads
+          processData: false, // Prevent jQuery from processing the data
+          contentType: false, // Prevent jQuery from setting the content type
           success: function (data) {
             alert('Employee saved successfully');
             form.trigger('reset');

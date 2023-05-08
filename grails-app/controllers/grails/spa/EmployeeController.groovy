@@ -15,7 +15,7 @@ class EmployeeController {
     }
 
     def save() {
-        def saveResult = employeeService.saveEmployee(params)
+        def saveResult = employeeService.saveEmployee(params, request)
         if (saveResult == 'success') {
             render 'success'
         } else {
