@@ -37,11 +37,11 @@ class EmployeeService {
 
         def totalCount = Employee.count()
         def result = [
-                totalCount : totalCount,
-                currentPage: page,
-                pageSize   : pageSize,
-                totalPages : Math.ceil(filteredCount / pageSize),
-                employees  : employees,
+                totalCount   : totalCount,
+                currentPage  : page,
+                pageSize     : pageSize,
+                totalPages   : Math.ceil(filteredCount / pageSize),
+                employees    : employees,
                 filteredCount: filteredCount
         ]
 
@@ -50,9 +50,13 @@ class EmployeeService {
 
     def saveEmployee(params, request) {
         def birthCertificateFile = saveBirthCertificateFile(params, request)
-        def employee = new Employee(params)
-        employee.birthCertificate = birthCertificateFile
-
+        def employee = new Employee(
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+                birthDate: new Date().parse('yyyy-MM-dd', params.birthDate),
+                birthCertificate:birthCertificateFile
+        )
         if (employee.save()) {
             return 'success'
         } else {

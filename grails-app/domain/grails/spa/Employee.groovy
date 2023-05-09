@@ -1,10 +1,13 @@
 package grails.spa
 
+import org.springframework.format.annotation.DateTimeFormat
+
 class Employee {
 
     String firstName
     String lastName
     String email
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date birthDate
     File birthCertificate
 
@@ -15,8 +18,6 @@ class Employee {
         birthDate nullable: true
         birthCertificate nullable: true
     }
-
-    static belongsTo = [birthCertificate: File]
 
 }
 

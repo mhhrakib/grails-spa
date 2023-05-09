@@ -33,7 +33,7 @@
 
         <div class="form-group">
             <label for="birthDate">Birth Date</label>
-            <input type="date" class="form-control" id="birthDate" name="birthDate" required/>
+            <input type="date" class="form-control" id="birthDate" name="birthDate" placeholder="yyyy-mm-dd" required/>
             <span class="error text-danger text-sm" id="birthDateError"></span>
             <br>
         </div>

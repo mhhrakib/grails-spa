@@ -90,4 +90,6 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
+grails.databinding.dateFormats = ['yyyy-MM-dd', "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"]
+
 myapp.upload.directory = "uploads"
