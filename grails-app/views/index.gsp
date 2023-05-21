@@ -38,15 +38,24 @@
             <br>
         </div>
 
-        <div class="form-group">
-            <label for="birthCertificate">Birth Certificate</label>
-            <input type="file" class="form-control" id="birthCertificate" name="birthCertificate"/>
-            <span class="error text-danger text-sm" id="birthCertificateError"></span>
-            <br>
+        <div class="row" id="fileInputs">
+            <div id="fileInput_0">
+                <div class="col-md-6 form-group">
+                    <label for="title_0">Document Type</label>
+                    <input type="text" name="title_0" id="title_0" placeholder="Title"/>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="file_0">File</label>
+                    <input type="file" class="form-control-file" name="file_0" id="file_0"/>
+                </div>
+            </div>
+
+            <button type="button" id="addFileBtn">Add File</button>
         </div>
-
-
+<br>
         <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
+
+
     </form>
 
     <br>
@@ -119,15 +128,61 @@
   clearErrorOnFocus("lastName");
   clearErrorOnFocus("email");
 
+
   $(document).ready(function () {
+
+    var fileCount = 1;
+
+    $('#addFileBtn').click(function(e) {
+      var fileId = 'file_' + fileCount;
+      var titleId = 'title_' + fileCount;
+      var fileInputId = 'fileInput_' + fileCount;
+      console.log(fileCount, fileInputId, fileId, titleId);
+
+      e.preventDefault();
+      var inputHtml = '<div id="fileInput_' + fileCount + '">' +
+        '<div class="col-md-6 form-group">' +
+        '<label for="' + titleId + '">Document Type</label>' +
+        '<input type="text" name="' + titleId + '" id="' + titleId + '" placeholder="Title"/>' +
+        '</div>' +
+        '<div class="col-md-4 form-group">' +
+        '<label for="' + fileId + '">File</label>' +
+        '<input type="file" class="form-control-file" name="' + fileId + '" id="' + fileId + '"/>' +
+        '</div>' +
+        '<button class="removeFileBtn" data-file-id="' + fileCount + '">-</button>' +
+        '</div>';
+      %{--var inputHtml =--}%
+      %{--  `<div id="${fileInputId}">--}%
+      %{--      <div class="col-md-6 form-group">--}%
+      %{--          <label for="${titleId}">Document Type</label>--}%
+      %{--          <input type="text" name="${titleId}" id="${titleId}" placeholder="Title"/>--}%
+      %{--      </div>--}%
+      %{--      <div class="col-md-4 form-group">--}%
+      %{--          <label for="${fileId}">File</label>--}%
+      %{--          <input type="file" class="form-control-file" name="${fileId}" id="${fileId}"/>--}%
+      %{--      </div>--}%
+      %{--      <button class="removeFileBtn" data-file-id="${fileCount}">-</button>--}%
+      %{--  </div>`;--}%
+            console.log(inputHtml);
+      $('#fileInputs').append(inputHtml);
+      fileCount++;
+    });
+
+    $(document).on('click', '.removeFileBtn', function(e) {
+      e.preventDefault();
+      var fileId = $(this).data('file-id');
+      console.log(fileId);
+      $('#fileInput_' + fileId).remove();
+    });
+
     $('#submitBtn').click(function (event) {
       event.preventDefault();
-      // var form = $('#employeeForm')[0];
-      // var url = form.attr('action');
-      // var formData = new FormData(form);
       var form = $('#employeeForm')[0];
       var url = form.action;
       var formData = new FormData(form);
+      // Append each file input to the FormData object
+      // formData.append('files[]', fileInputs);
+      console.log('formData: '+formData)
       if (confirm('Are you sure you want to save this employee?')) {
         $.ajax({
           type: "POST",

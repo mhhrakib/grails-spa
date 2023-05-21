@@ -1,5 +1,8 @@
 package grails.spa
 
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import java.util.List;
+
 class EmployeeService {
 
     def fileService
@@ -49,15 +52,30 @@ class EmployeeService {
     }
 
     def saveEmployee(params, request) {
-        def birthCertificateFile = saveBirthCertificateFile(params, request)
+//        def fileTitlePairs = [:]
+        List<String> fileKeys = params.keySet().findAll { it.startsWith("file_") }.toList()
+//        List<String> titleKeys = params.keySet().findAll { it.startsWith("title_") }.toList()
+        fileKeys.each { fileKey ->
+            def uploadedFile = request.getFile(fileKey)
+            if (uploadedFile) {
+                String correspondingTitleKey = "title_" + fileKey.substring(5)
+                String type = params[correspondingTitleKey]
+                def res = fileService.save(uploadedFile, type)
+            } else {
+                // File is not present, handle the case
+                // ...
+            }
+        }
+
         def employee = new Employee(
                 firstName: params.firstName,
                 lastName: params.lastName,
                 email: params.email,
                 birthDate: new Date().parse('yyyy-MM-dd', params.birthDate),
-                birthCertificate:birthCertificateFile
+                birthCertificate: params.files
         )
-        if (employee.save()) {
+
+        if (employee.save(flush: true)) {
             return 'success'
         } else {
             return employee.errors
@@ -88,12 +106,10 @@ class EmployeeService {
         }
     }
 
-    private saveBirthCertificateFile(params, request) {
-        def birthCertificateFile = null
-        if (params.birthCertificate) {
-            def uploadedFile = request.getFile('birthCertificate')
-            birthCertificateFile = fileService.save(uploadedFile, "birthCertificate")
-        }
-        return birthCertificateFile
+    private saveFile(request, fileName, title) {
+        def res = null
+        def uploadedFile = request.getFile(fileName)
+        res = fileService.save(uploadedFile, title)
+        return res
     }
 }

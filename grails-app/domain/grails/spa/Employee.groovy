@@ -9,7 +9,7 @@ class Employee {
     String email
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date birthDate
-    File birthCertificate
+    List<File> birthCertificate
 
     static constraints = {
         firstName nullable: false, blank: false, size: 2..50, message: "The first name is invalid. It must be between 2 and 50 characters long."

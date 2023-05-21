@@ -10,17 +10,6 @@ import java.nio.file.StandardCopyOption
 
 class FileService {
 
-//    private saveFileToDisk(MultipartFile file) {
-//        def uploadDir = ApplicationHolder.getApplication().config.myapp.upload.directory
-//        // Generate a unique filename for the file
-//        String newFileName = UUID.randomUUID().toString() + "." + fileExtension
-//        def filePath = "${uploadDir}/${newFileName}"
-//        def fileStream = new FileOutputStream(new File(filePath))
-//        fileStream.write(file.getBytes())
-//        fileStream.close()
-//        return filePath
-//    }
-
     def save(MultipartFile file, String type) {
         String originalFileName = file.getOriginalFilename()
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf('.') + 1)
@@ -28,7 +17,7 @@ class FileService {
         long fileSize = file.getSize()
 
         // Generate a unique filename for the file
-        String newFileName = UUID.randomUUID().toString() + "." + fileExtension
+        String newFileName = UUID.randomUUID().toString() + "_" + originalFileName
 
         // Get the upload directory from the configuration
         String uploadDirectory = Holders.grailsApplication.config.myapp.upload.directory
@@ -41,15 +30,12 @@ class FileService {
 
         // Save the file to disk
         Path destinationPath = Paths.get(uploadDirectory, newFileName)
-//        Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING)
         Files.copy(file.getInputStream(), destinationPath, StandardCopyOption.REPLACE_EXISTING)
 
         // Create a new File object and save it to the database
         File savedFile = new File(path: destinationPath.toString(), name: newFileName,
                 type: type, extension: fileExtension, size: fileSize, contentType: contentType)
-        savedFile.save(flush: true)
-
-        return savedFile
+        return savedFile.save(flush: true)
     }
 
     def download(String fileName) {
