@@ -16,43 +16,46 @@ class FileService {
         String contentType = file.getContentType()
         long fileSize = file.getSize()
 
-        // Generate a unique filename for the file
         String newFileName = UUID.randomUUID().toString() + "_" + originalFileName
 
-        // Get the upload directory from the configuration
         String uploadDirectory = Holders.grailsApplication.config.myapp.upload.directory
 
-        // Create the upload directory if it doesn't exist
         Path uploadPath = Paths.get(uploadDirectory)
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath)
         }
 
-        // Save the file to disk
         Path destinationPath = Paths.get(uploadDirectory, newFileName)
         Files.copy(file.getInputStream(), destinationPath, StandardCopyOption.REPLACE_EXISTING)
 
-        // Create a new File object and save it to the database
         File savedFile = new File(path: destinationPath.toString(), name: newFileName,
                 type: type, extension: fileExtension, size: fileSize, contentType: contentType)
-        return savedFile.save(flush: true)
+
+        return savedFile
     }
 
-    def download(String fileName) {
-        File file = File.findByName(fileName)
-        if (file) {
-            String filePath = file.path
+    def getFileById(fileId) {
+        return File.get(fileId)
+    }
 
-            // Set the content type of the response based on the file type
-            response.contentType = file.contentType
-
-            // Write the file to the response output stream
-            response.outputStream << new File(filePath).bytes
-
-            // Return null to prevent the view from being rendered
-            return null
-        } else {
-            throw new FileNotFoundException("File not found: ${fileName}")
+    byte[] downloadFile(filePath) {
+        Path file = Paths.get(filePath)
+        if (Files.exists(file)) {
+            return Files.readAllBytes(file)
         }
+        return null
+    }
+
+    boolean deleteFile(Long fileId) {
+        def file = File.get(fileId)
+        if (file) {
+            Path filePath = Paths.get(file.path)
+            if (Files.exists(filePath)) {
+                Files.delete(filePath)
+                file.delete()
+                return true
+            }
+        }
+        return false
     }
 }

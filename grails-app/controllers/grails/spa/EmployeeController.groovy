@@ -15,7 +15,6 @@ class EmployeeController {
     }
 
     def save() {
-
         def saveResult = employeeService.saveEmployee(params, request)
         if (saveResult == 'success') {
             render 'success'
@@ -24,7 +23,6 @@ class EmployeeController {
                 errors = saveResult
             }
         }
-
     }
 
     def update() {
@@ -42,5 +40,14 @@ class EmployeeController {
 
     def delete() {
         return employeeService.deleteEmployee(params)
+    }
+
+    def getFiles() {
+        def res = employeeService.getAllFiles(params)
+        if(res == 'not found') {
+            render status: 404, 'not found'
+        } else {
+            render res as JSON
+        }
     }
 }

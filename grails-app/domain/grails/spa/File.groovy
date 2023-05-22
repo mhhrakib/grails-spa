@@ -9,6 +9,8 @@ class File {
     long size
     String path
 
+    static belongsTo = [employee: Employee]
+
     static constraints = {
         name(nullable: false)
         type(nullable: false)

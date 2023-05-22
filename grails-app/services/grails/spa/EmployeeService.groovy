@@ -52,28 +52,26 @@ class EmployeeService {
     }
 
     def saveEmployee(params, request) {
-//        def fileTitlePairs = [:]
+        def employee = new Employee(
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+                birthDate: new Date().parse('yyyy-MM-dd', params.birthDate),
+        )
         List<String> fileKeys = params.keySet().findAll { it.startsWith("file_") }.toList()
-//        List<String> titleKeys = params.keySet().findAll { it.startsWith("title_") }.toList()
         fileKeys.each { fileKey ->
             def uploadedFile = request.getFile(fileKey)
             if (uploadedFile) {
                 String correspondingTitleKey = "title_" + fileKey.substring(5)
                 String type = params[correspondingTitleKey]
                 def res = fileService.save(uploadedFile, type)
+                employee.addToFiles(res)
             } else {
                 // File is not present, handle the case
                 // ...
             }
         }
 
-        def employee = new Employee(
-                firstName: params.firstName,
-                lastName: params.lastName,
-                email: params.email,
-                birthDate: new Date().parse('yyyy-MM-dd', params.birthDate),
-                birthCertificate: params.files
-        )
 
         if (employee.save(flush: true)) {
             return 'success'
@@ -96,6 +94,15 @@ class EmployeeService {
         }
     }
 
+    def getAllFiles(params) {
+        def employee = Employee.get(params.id);
+        if (employee) {
+            return employee.files
+        } else {
+            return 'not found'
+        }
+    }
+
     def deleteEmployee(params) {
         def employee = Employee.get(params.id)
         if (employee) {
@@ -112,4 +119,5 @@ class EmployeeService {
         res = fileService.save(uploadedFile, title)
         return res
     }
+
 }

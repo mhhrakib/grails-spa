@@ -9,17 +9,20 @@
 <div class="container">
     <h1>Employee</h1>
     <br>
+
     <form id="employeeForm" action="${createLink(controller: 'employee', action: 'save')}" method="post">
         <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" minlength="2" maxlength="50"/>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name"
+                   minlength="2" maxlength="50"/>
             <span class="error text-danger text-sm" id="firstNameError"></span>
             <br>
         </div>
 
         <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" minlength="2" maxlength="50"/>
+            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name"
+                   minlength="2" maxlength="50"/>
             <span class="error text-danger text-sm" id="lastNameError"></span>
             <br>
         </div>
@@ -44,6 +47,7 @@
                     <label for="title_0">Document Type</label>
                     <input type="text" name="title_0" id="title_0" placeholder="Title"/>
                 </div>
+
                 <div class="col-md-4 form-group">
                     <label for="file_0">File</label>
                     <input type="file" class="form-control-file" name="file_0" id="file_0"/>
@@ -52,22 +56,24 @@
 
             <button type="button" id="addFileBtn">Add File</button>
         </div>
-<br>
+        <br>
         <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
-
 
     </form>
 
     <br>
 
     <h1>Employee List</h1>
+
     <div class="row mb-3">
         <div class="col-sm-6">
             <input type="text" class="form-control" id="searchInput" placeholder="Search...">
         </div>
+
         <div class="col-sm-3">
 
         </div>
+
         <div class="col-sm-3">
             <select id="pageSizeSelect" class="form-select">
                 <option value="5">5 per page</option>
@@ -84,16 +90,21 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
+            <th>Birth Date</th>
+            <th>Files</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
+
     <div class="row mb-3">
         <div class="col-sm-6" id="paginationInfo">
-            Showing <span id="startEntry"></span> to <span id="endEntry"></span> of <span id="totalEntries"></span> entries
+            Showing <span id="startEntry"></span> to <span id="endEntry"></span> of <span
+                id="totalEntries"></span> entries
         </div>
+
         <div class="col-sm-6">
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-end" id="paginationLinks">
@@ -102,6 +113,36 @@
         </div>
     </div>
 </div>
+
+<div class="modal modal-lg fade" id="fileDetailsModal" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabel">File Details</h5>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped" id="fileDetailsTable">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Content Type</th>
+                        <th>Extension</th>
+                        <th>Size</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="fileDetailsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   function displayErrors(errors) {
@@ -119,7 +160,7 @@
     var errorSpan = document.getElementById(field + "Error");
     var inputField = document.getElementById(field);
 
-    inputField.addEventListener("focus", function() {
+    inputField.addEventListener("focus", function () {
       errorSpan.innerHTML = "";
     });
   }
@@ -133,7 +174,7 @@
 
     var fileCount = 1;
 
-    $('#addFileBtn').click(function(e) {
+    $('#addFileBtn').click(function (e) {
       var fileId = 'file_' + fileCount;
       var titleId = 'title_' + fileCount;
       var fileInputId = 'fileInput_' + fileCount;
@@ -151,24 +192,11 @@
         '</div>' +
         '<button class="removeFileBtn" data-file-id="' + fileCount + '">-</button>' +
         '</div>';
-      %{--var inputHtml =--}%
-      %{--  `<div id="${fileInputId}">--}%
-      %{--      <div class="col-md-6 form-group">--}%
-      %{--          <label for="${titleId}">Document Type</label>--}%
-      %{--          <input type="text" name="${titleId}" id="${titleId}" placeholder="Title"/>--}%
-      %{--      </div>--}%
-      %{--      <div class="col-md-4 form-group">--}%
-      %{--          <label for="${fileId}">File</label>--}%
-      %{--          <input type="file" class="form-control-file" name="${fileId}" id="${fileId}"/>--}%
-      %{--      </div>--}%
-      %{--      <button class="removeFileBtn" data-file-id="${fileCount}">-</button>--}%
-      %{--  </div>`;--}%
-            console.log(inputHtml);
       $('#fileInputs').append(inputHtml);
       fileCount++;
     });
 
-    $(document).on('click', '.removeFileBtn', function(e) {
+    $(document).on('click', '.removeFileBtn', function (e) {
       e.preventDefault();
       var fileId = $(this).data('file-id');
       console.log(fileId);
@@ -180,9 +208,7 @@
       var form = $('#employeeForm')[0];
       var url = form.action;
       var formData = new FormData(form);
-      // Append each file input to the FormData object
-      // formData.append('files[]', fileInputs);
-      console.log('formData: '+formData)
+      console.log('formData: ' + formData)
       if (confirm('Are you sure you want to save this employee?')) {
         $.ajax({
           type: "POST",
@@ -205,22 +231,22 @@
       }
     });
     refreshTable();
-    $('#search').on('keyup', function() {
+    $('#search').on('keyup', function () {
       dataTable.search($(this).val()).draw();
     });
     $('#searchInput').on('input', function () {
       refreshTable();
     });
-    $('#pageSizeSelect').on('change', function() {
+    $('#pageSizeSelect').on('change', function () {
       refreshTable();
     });
     // Handle pagination links
     $('#paginationLinks').on('click', '.page-link', function (event) {
       event.preventDefault();
       var page = $(this).text();
-      if(page == "Next") {
+      if (page == "Next") {
         page = parseInt($('#paginationLinks .active').text()) + 1;
-      } else if(page == "Prev") {
+      } else if (page == "Prev") {
         page = parseInt($('#paginationLinks .active').text()) - 1;
       }
       refreshTable(page);
@@ -235,7 +261,7 @@
     $.ajax({
       type: "GET",
       url: url,
-      data: { page: page, pageSize:pageSize, search: search },
+      data: {page: page, pageSize: pageSize, search: search},
       success: function (data) {
         console.log(data)
         table.find('tbody').empty();
@@ -245,10 +271,25 @@
           $('<td>').text(element.firstName).appendTo(row);
           $('<td>').text(element.lastName).appendTo(row);
           $('<td>').text(element.email).appendTo(row);
+          let formattedDate = new Date(element.birthDate).toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+
+          $('<td>').text(formattedDate).appendTo(row);
+          var fileViewDiv = $('<div>').addClass('btn-group').appendTo($('<td>').appendTo(row));
+          var viewBtn = $('<button>').text('View').addClass('btn btn-info').appendTo(fileViewDiv);
+          viewBtn.click(function () {
+            showFiles(element.id);
+          });
+
+
           var actionsDiv = $('<div>').addClass('btn-group').appendTo($('<td>').appendTo(row));
+
           var editBtn = $('<button>').text('Edit').addClass('btn btn-info').appendTo(actionsDiv);
           editBtn.click(function () {
-            editEmployee(element.id, element.firstName, element.lastName, element.email);
+            editEmployee(element.id, element.firstName, element.lastName, element.email, element.birthDate);
           });
           var deleteBtn = $('<button>').text('Delete').addClass('btn btn-danger').appendTo(actionsDiv);
           deleteBtn.click(function () {
@@ -269,7 +310,7 @@
         // Display pagination information
         var filteredCount = data.filteredCount;
         var totalCount = data.totalCount;
-        var start = ((data.currentPage - 1) * pageSize) + (data.totalPages == 0 ? 0:1);
+        var start = ((data.currentPage - 1) * pageSize) + (data.totalPages == 0 ? 0 : 1);
         var end = Math.min(start + data.pageSize - 1, filteredCount);
         var info = 'Showing ' + start + ' to ' + end + ' of ' + filteredCount + ' entries (filtered from ' + totalCount + ' total entries)';
         $('#paginationInfo').text(info);
@@ -281,11 +322,68 @@
     });
   }
 
-  function editEmployee(id, firstName, lastName, email) {
+  function showFiles(employeeId) {
+    var url = "${createLink(controller: 'employee', action: 'getFiles')}" + '/' + employeeId;
+    var filesTable = $('#fileDetailsTable');
+
+    $.ajax({
+      type: "GET",
+      url: url,
+      success: function (data) {
+        filesTable.find('tbody').empty();
+
+        // Iterate over the file data and add rows to the table
+        $(data).each(function (index, file) {
+          var fileRow = $('<tr>').appendTo(filesTable.find('tbody'));
+          $('<td>').text(file.name.substring(file.name.indexOf("_") + 1)).appendTo(fileRow);
+          $('<td>').text(file.type).appendTo(fileRow);
+          $('<td>').text(file.contentType).appendTo(fileRow);
+          $('<td>').text(file.extension).appendTo(fileRow);
+          $('<td>').text(file.size).appendTo(fileRow);
+
+          var buttonGroup = $('<div>').addClass('btn-group').appendTo(fileRow);
+
+          // Download button
+          var downloadBtn = $('<button>').addClass('btn btn-primary').appendTo(buttonGroup);
+          var downloadIcon = $('<i>').addClass('fa fa-download').appendTo(downloadBtn);
+          downloadBtn.click(function () {
+            window.location.href = "${createLink(controller: 'file', action: 'download')}/" + file.id;
+          });
+
+          // Delete button
+          var deleteBtn = $('<button>').addClass('btn btn-danger').appendTo(buttonGroup);
+          var deleteIcon = $('<i>').addClass('fa fa-trash').appendTo(deleteBtn);
+          deleteBtn.click(function () {
+            if(confirm("Are you sure to delete this file?")) {
+              window.location.href = "${createLink(controller: 'file', action: 'delete')}/" + file.id;
+            }
+          });
+          %{--// Create a download button for each file--}%
+          %{--var downloadBtn = $('<button>').text('Download').addClass('btn btn-primary').appendTo($('<td>').appendTo(fileRow));--}%
+          %{--downloadBtn.click(function () {--}%
+          %{--  window.location.href = "${createLink(controller: 'file', action: 'download')}/" + file.id;--}%
+          %{--});--}%
+        });
+
+        // Show the modal
+        $('#fileDetailsModal').modal('show');
+      },
+      error: function (xhr, status, error) {
+        // Handle error if any
+        console.log(error);
+      }
+    });
+  }
+
+
+  function editEmployee(id, firstName, lastName, email, birthDate) {
+    console.log("BirthDate: " + birthDate);
     $('#id').val(id);
     $('#firstName').val(firstName);
     $('#lastName').val(lastName);
     $('#email').val(email);
+    $('#birthDate').val(new Date(birthDate).toISOString().split('T')[0]);
+
     $('#submitBtn').text('Update').unbind('click').click(function (event) {
       event.preventDefault();
       var form = $('#employeeForm');
@@ -333,7 +431,7 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     $.validator.setDefaults({
       submitHandler: function () {
         // alert( "Form successful submitted!" );
@@ -373,21 +471,21 @@
           email: "Please enter a valid email address"
         }
       },
-      errorElement : 'span',
+      errorElement: 'span',
       errorClass: 'text-danger text-sm',
-      highlight: function(element) {
+      highlight: function (element) {
         $(element).closest('.form-group').addClass('error');
       },
-      unhighlight: function(element) {
+      unhighlight: function (element) {
         $(element).closest('.form-group').removeClass('error');
       },
-      errorPlacement: function(error, element) {
-        if (element.attr("name") == "firstName" ) {
-          error.appendTo( $("#firstNameError") );
-        } else if (element.attr("name") == "lastName" ) {
-          error.appendTo( $("#lastNameError") );
-        } else if (element.attr("name") == "email" ) {
-          error.appendTo( $("#emailError") );
+      errorPlacement: function (error, element) {
+        if (element.attr("name") == "firstName") {
+          error.appendTo($("#firstNameError"));
+        } else if (element.attr("name") == "lastName") {
+          error.appendTo($("#lastNameError"));
+        } else if (element.attr("name") == "email") {
+          error.appendTo($("#emailError"));
         }
       }
     });
