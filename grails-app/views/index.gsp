@@ -7,63 +7,68 @@
 
 <body>
 <div class="container">
-    <h1>Employee</h1>
+    <h3>Employee</h3>
     <br>
 
     <form id="employeeForm" action="${createLink(controller: 'employee', action: 'save')}" method="post">
-        <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name"
-                   minlength="2" maxlength="50"/>
-            <span class="error text-danger text-sm" id="firstNameError"></span>
-            <br>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="firstName">First Name</label>
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name"
+                       minlength="2" maxlength="50"/>
+                <span class="error text-danger text-sm" id="firstNameError"></span>
+                <br>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="lastName">Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name"
+                       minlength="2" maxlength="50"/>
+                <span class="error text-danger text-sm" id="lastNameError"></span>
+                <br>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name"
-                   minlength="2" maxlength="50"/>
-            <span class="error text-danger text-sm" id="lastNameError"></span>
-            <br>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"/>
+                <span class="error text-danger text-sm" id="emailError"></span>
+                <br>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="birthDate">Birth Date</label>
+                <input type="date" class="form-control" id="birthDate" name="birthDate" placeholder="yyyy-mm-dd" required/>
+                <span class="error text-danger text-sm" id="birthDateError"></span>
+                <br>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"/>
-            <span class="error text-danger text-sm" id="emailError"></span>
-            <br>
-        </div>
-
-        <div class="form-group">
-            <label for="birthDate">Birth Date</label>
-            <input type="date" class="form-control" id="birthDate" name="birthDate" placeholder="yyyy-mm-dd" required/>
-            <span class="error text-danger text-sm" id="birthDateError"></span>
-            <br>
-        </div>
-
-        <div class="row" id="fileInputs">
-            <div id="fileInput_0">
-                <div class="col-md-6 form-group">
-                    <label for="title_0">Document Type</label>
-                    <input type="text" name="title_0" id="title_0" placeholder="Title"/>
+        <div id="fileInputs">
+            <div class="row" id="fileInput_0">
+                <div class="form-group col-md-6">
+                    <label for="title_0">Document Type</label><br>
+                    <input type="text" class="form-control" name="title_0" id="title_0" placeholder="Title"/>
                 </div>
 
-                <div class="col-md-4 form-group">
-                    <label for="file_0">File</label>
-                    <input type="file" class="form-control-file" name="file_0" id="file_0"/>
+                <div class="form-group col-md-5">
+                    <label for="file_0">File</label><br>
+                    <input type="file" class="form-control" name="file_0" id="file_0"/>
+                </div>
+                <div class="col-md-1">
+                    <br>
+                    <button type="button" class="btn btn-primary" id="addFileBtn">+</button>
                 </div>
             </div>
-
-            <button type="button" id="addFileBtn">Add File</button>
         </div>
         <br>
+
         <button type="submit" class="btn btn-primary" id="submitBtn">Save</button>
 
     </form>
 
     <br>
 
-    <h1>Employee List</h1>
+    <h3>Employee List</h3>
 
     <div class="row mb-3">
         <div class="col-sm-6">
@@ -118,7 +123,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="fileModalLabel">File Details</h5>
+                <h5 class="modal-title" id="fileModalLabel">File Details of Employee <span id="xyz"></span><span id="empId"></span></h5>
             </div>
             <div class="modal-body">
                 <table class="table table-striped" id="fileDetailsTable">
@@ -146,7 +151,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   function displayErrors(errors) {
-    // console.log(errors, errors.length);
     for (let i = 0; i < errors.length; i++) {
       var error = errors[i];
       var fieldName = error.field;
@@ -178,21 +182,24 @@
       var fileId = 'file_' + fileCount;
       var titleId = 'title_' + fileCount;
       var fileInputId = 'fileInput_' + fileCount;
+      var fileInputRow = 'fileInput_' + fileCount;
       console.log(fileCount, fileInputId, fileId, titleId);
 
       e.preventDefault();
-      var inputHtml = '<div id="fileInput_' + fileCount + '">' +
+
+      var inputHtml = '<div class="row" id="fileInput_' + fileCount + '">' +
         '<div class="col-md-6 form-group">' +
         '<label for="' + titleId + '">Document Type</label>' +
-        '<input type="text" name="' + titleId + '" id="' + titleId + '" placeholder="Title"/>' +
+        '<input type="text" required class="form-control" name="' + titleId + '" id="' + titleId + '" placeholder="Title"/>' +
         '</div>' +
-        '<div class="col-md-4 form-group">' +
-        '<label for="' + fileId + '">File</label>' +
-        '<input type="file" class="form-control-file" name="' + fileId + '" id="' + fileId + '"/>' +
+        '<div class="col-md-5 form-group">' +
+        '<label for="' + fileId + '">File</label><br>' +
+        '<input type="file" required class="form-control" name="' + fileId + '" id="' + fileId + '"/>' +
         '</div>' +
-        '<button class="removeFileBtn" data-file-id="' + fileCount + '">-</button>' +
+        '<div class="col-md-1"> <br><button class="removeFileBtn btn btn-danger" data-file-id="' + fileCount + '">-</button></div>' +
         '</div>';
       $('#fileInputs').append(inputHtml);
+
       fileCount++;
     });
 
@@ -201,6 +208,7 @@
       var fileId = $(this).data('file-id');
       console.log(fileId);
       $('#fileInput_' + fileId).remove();
+      $('#fileInputRow' + fileId).remove();
     });
 
     $('#submitBtn').click(function (event) {
@@ -253,6 +261,18 @@
     });
   });
 
+
+  $(document).on('click', '#fileDetailsModal .btn-delete', function(event) {
+    event.preventDefault();
+    console.log("clicked");
+    var fileId = $(this).attr('data-file-id'); // Retrieve the file ID from the data attribute
+    console.log('file id '+fileId);
+    if (confirm("Are you sure you want to delete this file?")) {
+      deleteFile(fileId);
+      console.log($("#empId").text());
+      populateFileTable($("#empId").text());
+    }
+  });
   function refreshTable(page = 1) {
     var table = $('#employeeTable');
     var search = $('#searchInput').val();
@@ -322,17 +342,16 @@
     });
   }
 
-  function showFiles(employeeId) {
+  function populateFileTable(employeeId) {
     var url = "${createLink(controller: 'employee', action: 'getFiles')}" + '/' + employeeId;
     var filesTable = $('#fileDetailsTable');
-
+    $('#xyz').text("#");
+    $('#empId').text(employeeId);
     $.ajax({
       type: "GET",
       url: url,
       success: function (data) {
         filesTable.find('tbody').empty();
-
-        // Iterate over the file data and add rows to the table
         $(data).each(function (index, file) {
           var fileRow = $('<tr>').appendTo(filesTable.find('tbody'));
           $('<td>').text(file.name.substring(file.name.indexOf("_") + 1)).appendTo(fileRow);
@@ -343,37 +362,32 @@
 
           var buttonGroup = $('<div>').addClass('btn-group').appendTo(fileRow);
 
-          // Download button
           var downloadBtn = $('<button>').addClass('btn btn-primary').appendTo(buttonGroup);
           var downloadIcon = $('<i>').addClass('fa fa-download').appendTo(downloadBtn);
           downloadBtn.click(function () {
             window.location.href = "${createLink(controller: 'file', action: 'download')}/" + file.id;
           });
 
-          // Delete button
-          var deleteBtn = $('<button>').addClass('btn btn-danger').appendTo(buttonGroup);
+          var deleteBtn = $('<button>').addClass('btn btn-danger btn-delete').appendTo(buttonGroup);
           var deleteIcon = $('<i>').addClass('fa fa-trash').appendTo(deleteBtn);
-          deleteBtn.click(function () {
-            if(confirm("Are you sure to delete this file?")) {
-              window.location.href = "${createLink(controller: 'file', action: 'delete')}/" + file.id;
-            }
-          });
-          %{--// Create a download button for each file--}%
-          %{--var downloadBtn = $('<button>').text('Download').addClass('btn btn-primary').appendTo($('<td>').appendTo(fileRow));--}%
-          %{--downloadBtn.click(function () {--}%
-          %{--  window.location.href = "${createLink(controller: 'file', action: 'download')}/" + file.id;--}%
-          %{--});--}%
+          deleteBtn.attr('data-file-id', file.id);
+          // deleteBtn.click(function () {
+          //   deleteFile(file.id);
+          // });
         });
 
-        // Show the modal
-        $('#fileDetailsModal').modal('show');
       },
       error: function (xhr, status, error) {
-        // Handle error if any
         console.log(error);
       }
     });
   }
+
+  function showFiles(employeeId) {
+    populateFileTable(employeeId);
+    $('#fileDetailsModal').modal('show');
+  }
+
 
 
   function editEmployee(id, firstName, lastName, email, birthDate) {
@@ -415,7 +429,7 @@
     if (confirm('Are you sure you want to delete this employee?')) {
       var url = "${createLink(controller: 'employee', action: 'delete')}" + '/' + id;
       $.ajax({
-        type: "POST",
+        type: "DELETE",
         url: url,
         success: function (data) {
           alert('Employee deleted successfully');
@@ -426,6 +440,21 @@
         }
       });
     }
+  }
+
+  function deleteFile(fileId) {
+
+    $.ajax({
+      url: "${createLink(controller: 'file', action: 'delete')}/" + fileId,
+      type: 'DELETE',
+      async: false,
+      success: function (data) {
+        alert("File deletion successful.");
+      },
+      error: function (xhr, status, error) {
+      }
+    });
+
   }
 </script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>

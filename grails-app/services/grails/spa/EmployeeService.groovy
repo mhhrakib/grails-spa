@@ -58,6 +58,17 @@ class EmployeeService {
                 email: params.email,
                 birthDate: new Date().parse('yyyy-MM-dd', params.birthDate),
         )
+        createEmployee(params, request, employee)
+
+
+        if (employee.save(flush: true)) {
+            return 'success'
+        } else {
+            return employee.errors
+        }
+    }
+
+    private createEmployee(params, request, employee) {
         List<String> fileKeys = params.keySet().findAll { it.startsWith("file_") }.toList()
         fileKeys.each { fileKey ->
             def uploadedFile = request.getFile(fileKey)
@@ -71,19 +82,14 @@ class EmployeeService {
                 // ...
             }
         }
-
-
-        if (employee.save(flush: true)) {
-            return 'success'
-        } else {
-            return employee.errors
-        }
     }
 
-    def updateEmployee(params) {
+    def updateEmployee(params, request) {
         def employee = Employee.get(params.id)
+        employee.properties = params
         if (employee) {
-            employee.properties = params
+            // employee.birthDate = new Date().parse('yyyy-MM-dd', params.birthDate)
+            createEmployee(params, request, employee)
             if (employee.save()) {
                 return 'success'
             } else {
@@ -111,13 +117,6 @@ class EmployeeService {
         } else {
             return 'not found'
         }
-    }
-
-    private saveFile(request, fileName, title) {
-        def res = null
-        def uploadedFile = request.getFile(fileName)
-        res = fileService.save(uploadedFile, title)
-        return res
     }
 
 }

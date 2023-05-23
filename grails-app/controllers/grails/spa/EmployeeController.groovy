@@ -3,6 +3,9 @@ package grails.spa
 import grails.converters.JSON
 
 class EmployeeController {
+
+    static allowedMethods = [index: "GET",list: "GET", delete: "DELETE", save: "POST", update: "POST", getFiles: "GET"]
+
     def employeeService
 
     def index() {
@@ -26,7 +29,7 @@ class EmployeeController {
     }
 
     def update() {
-        def updateResult = employeeService.updateEmployee(params) // Call the updateEmployee method on the injected service
+        def updateResult = employeeService.updateEmployee(params, request)
         if (updateResult == 'success') {
             render 'success'
         } else if(updateResult == 'not found') {
@@ -39,7 +42,8 @@ class EmployeeController {
     }
 
     def delete() {
-        return employeeService.deleteEmployee(params)
+        def res = employeeService.deleteEmployee(params)
+        render res
     }
 
     def getFiles() {

@@ -46,7 +46,7 @@ class FileService {
         return null
     }
 
-    boolean deleteFile(Long fileId) {
+    boolean deleteFile(fileId) {
         def file = File.get(fileId)
         if (file) {
             Path filePath = Paths.get(file.path)
