@@ -1,8 +1,5 @@
 package grails.spa
 
-import org.springframework.web.multipart.MultipartHttpServletRequest
-import java.util.List;
-
 class EmployeeService {
 
     def fileService
@@ -60,7 +57,6 @@ class EmployeeService {
         )
         createEmployee(params, request, employee)
 
-
         if (employee.save(flush: true)) {
             return 'success'
         } else {
@@ -86,9 +82,10 @@ class EmployeeService {
 
     def updateEmployee(params, request) {
         def employee = Employee.get(params.id)
+        // incredible fix
+        params.birthDate = new Date().parse('yyyy-MM-dd', params.birthDate)
         employee.properties = params
         if (employee) {
-            // employee.birthDate = new Date().parse('yyyy-MM-dd', params.birthDate)
             createEmployee(params, request, employee)
             if (employee.save()) {
                 return 'success'
