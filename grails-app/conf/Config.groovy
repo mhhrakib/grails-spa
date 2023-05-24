@@ -91,5 +91,6 @@ log4j = {
 }
 
 grails.databinding.dateFormats = ['yyyy-MM-dd', "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"]
+grails.gorm.default.timezone = 'Asia/Dhaka'
 
 myapp.upload.directory = "uploads"

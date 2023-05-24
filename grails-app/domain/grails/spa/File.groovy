@@ -8,6 +8,7 @@ class File {
     String extension
     long size
     String path
+    Date createdAt
 
     static belongsTo = [employee: Employee]
 

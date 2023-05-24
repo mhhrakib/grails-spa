@@ -16,6 +16,7 @@ class FileService {
         String contentType = file.getContentType()
         long fileSize = file.getSize()
 
+
         String newFileName = UUID.randomUUID().toString() + "_" + originalFileName
 
         String uploadDirectory = Holders.grailsApplication.config.myapp.upload.directory
@@ -29,7 +30,7 @@ class FileService {
         Files.copy(file.getInputStream(), destinationPath, StandardCopyOption.REPLACE_EXISTING)
 
         File savedFile = new File(path: destinationPath.toString(), name: newFileName,
-                type: type, extension: fileExtension, size: fileSize, contentType: contentType)
+                type: type, extension: fileExtension, size: fileSize, contentType: contentType, createdAt: new Date())
 
         return savedFile
     }

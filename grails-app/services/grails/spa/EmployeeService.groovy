@@ -1,5 +1,7 @@
 package grails.spa
 
+import org.springframework.web.multipart.MultipartFile
+
 class EmployeeService {
 
     def fileService
@@ -67,8 +69,8 @@ class EmployeeService {
     private createEmployee(params, request, employee) {
         List<String> fileKeys = params.keySet().findAll { it.startsWith("file_") }.toList()
         fileKeys.each { fileKey ->
-            def uploadedFile = request.getFile(fileKey)
-            if (uploadedFile) {
+            MultipartFile uploadedFile = request.getFile(fileKey)
+            if (uploadedFile.getSize() > 0) {
                 String correspondingTitleKey = "title_" + fileKey.substring(5)
                 String type = params[correspondingTitleKey]
                 def res = fileService.save(uploadedFile, type)
