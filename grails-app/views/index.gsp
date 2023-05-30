@@ -170,8 +170,8 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="http://transport.kgdcl.gov.bd/adminlte/plugins/jquery-validation/jquery.validate.min.js"></script>
-<script src="http://transport.kgdcl.gov.bd/adminlte/plugins/jquery-validation/additional-methods.min.js"></script>
+<script src="https://adminlte.io/themes/v3/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="https://adminlte.io/themes/v3/plugins/jquery-validation/additional-methods.min.js"></script>
 <script>
   function displayErrors(errors) {
     for (let i = 0; i < errors.length; i++) {
