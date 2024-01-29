@@ -9,8 +9,8 @@ Simple SPA CRUD using a pretty old version(2.2.5) of grails. But the code should
 # Installation
 * Clone the repository: `git clone https://github.com/mhhrakib/grails-spa.git`
 * Change into the project directory: `cd grails-spa`
-* Install dependencies: grails compile
-* Start the application: grails run-app
+* Install dependencies: `grails compile`
+* Start the application: `grails run-app`
 
 
 # Features
